@@ -1,36 +1,128 @@
 import { StatusBar } from 'expo-status-bar';
-import * as React from 'react';
-import { Platform, StyleSheet } from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
-
+import React,{useState,useEffect} from 'react';
+import { Platform, StyleSheet,View } from 'react-native';
+import { ListItem, Avatar,BottomSheet,Button,Icon,SearchBar,Text } from 'react-native-elements'
+import UrlBase from '../middleware/UrlBase';
 export default function ModalScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/ModalScreen.tsx" />
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+  const [isVisible, setIsVisible] = useState(false);
+
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+  const [cedula, setcedula] = useState('')
+  const [id, setid] = useState('')
+  const [paciente, setpaciente] = useState('')
+  const [pulso, setpulso] = useState('')
+  const [buscador, setbuscador] = useState('')
+  const [listado, setlistado] = useState([])
+
+
+  async function listadoPaciente(x){
+    try {
+      const response= await fetch(UrlBase+"/pacientes?cedula="+x);
+      const json=await response.json();
+      setData(json);
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setLoading(false)
+    }
+}
+
+const buscarPersonaXcedula=async(e)=>{
+  setbuscador(e)
+  listadoPaciente(e);
+}
+
+async function selecionarPacienete(params:Object) {
+  setid(params.id)
+  setcedula(params.cedula)
+  setpaciente(params.apellidos+' '+params.nombres)
+  setIsVisible(false)
+  listadoHistorial(params.id)
+}
+
+async function listadoHistorial(x){
+  try {
+    const response= await fetch(UrlBase+"/listado-historials?paciente="+x);
+    const json=await response.json();
+    setlistado(json);
+    
+  } catch (error) {
+    console.log(error)
+  }finally{
+    setLoading(false)
+  }
+}
+
+
+async function listadoPaciente(x){
+  try {
+    const response= await fetch(UrlBase+"/pacientes?cedula="+x);
+    const json=await response.json();
+    setData(json);
+  } catch (error) {
+    console.log(error)
+  }finally{
+    setLoading(false)
+  }
+}
+
+
+useEffect(() => {
+    listadoPaciente(buscador);   
+
+  }, []);
+
+  return (
+    <View>
+      <BottomSheet
+        isVisible={isVisible}
+        containerStyle={{ backgroundColor: 'rgba(0.5, 0.25, 0, 0.2)' }}
+        >
+          
+          <SearchBar
+            placeholder="Buscar por cédula..."
+            onChangeText={buscarPersonaXcedula}
+            value={buscador}
+          />
+            {
+            data.map((l, i) => (
+              <ListItem key={i} bottomDivider onPress={()=>selecionarPacienete(l)}>
+                <ListItem.Content>
+                  <ListItem.Title>{l.cedula}</ListItem.Title>
+                  <ListItem.Subtitle>{l.apellidos} {l.nombres}</ListItem.Subtitle>
+                </ListItem.Content>
+              </ListItem>
+            ))
+          }
+          <ListItem key="x" containerStyle={{ backgroundColor:'red' }} onPress={()=>setIsVisible(false)}>
+            <ListItem.Content>
+              <ListItem.Title style={{ color:'white' }}>Cancelar</ListItem.Title>
+            </ListItem.Content>
+          </ListItem>
+      </BottomSheet>
+      <Button
+        icon={<Icon name='person-search' color='#ffffff' />}
+        buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+        title='Buscar paciente'
+        onPress={()=>setIsVisible(true)}
+          />
+        
+        {
+          listado.length>0?
+        listado.map((l, i) => (
+          <ListItem key={i} bottomDivider>
+            <ListItem.Content>
+              <ListItem.Title>Pulso: {l.pulso_cardiaco}</ListItem.Title>
+              <ListItem.Subtitle>Fecha: {l.created_at}</ListItem.Subtitle>
+            </ListItem.Content>
+          </ListItem>
+        )):
+        <Text>No existe historial</Text>
+      }
+
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});

@@ -13,17 +13,27 @@ export default function TabTwoScreen() {
   const [nombres, setnombres] = useState('')
   const [cedula, setcedula] = useState('')
   const [buscador, setbuscador] = useState('')
-  const obtenerPacientes = async () => {
+ 
+  
+  async function listadoPaciente(x){
+    
     try {
-     const response = await fetch(UrlBase+"/pacientes");
-     const json = await response.json();
-     setData(json);
-   } catch (error) {
-     console.error(error);
-   } finally {
-     setLoading(false);
-   }
- }
+      const response= await fetch(UrlBase+"api/pacientes?cedula="+x,{
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      const json=await response.json();
+      setData(json);
+      
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setLoading(false)
+    }
+}
+
  const buscarPersonaXcedula=async(e)=>{
   setbuscador(e)
   listadoPaciente(e);
@@ -32,10 +42,10 @@ export default function TabTwoScreen() {
  const guardarPaciente=async()=>{
    try {
      setLoading(true)
-     const response= await fetch(UrlBase+"/guardar-paciente", {
+     const response= await fetch(UrlBase+"api/guardar-paciente", {
       method: 'POST',
       headers: {
-        Accept: 'application/json',
+        'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -55,11 +65,11 @@ export default function TabTwoScreen() {
     if(json.msg=='crear'){
       Alert.alert('','Paciente ingresado.!')
       vaciarCajas();
-      obtenerPacientes()
+      listadoPaciente(buscador)
     }
     if(json.msg=='editar'){
       Alert.alert('','Paciente actualizado.!')
-      obtenerPacientes()
+      listadoPaciente(buscador)
       vaciarCajas();
     }
    } catch (error) {
@@ -87,10 +97,10 @@ export default function TabTwoScreen() {
 const eliminarPaciente=async()=>{
   try {
     
-    const response= await fetch(UrlBase+"/eliminar-paciente", {
+    const response= await fetch(UrlBase+"api/eliminar-paciente", {
      method: 'POST',
      headers: {
-       Accept: 'application/json',
+       'Accept': 'application/json',
        'Content-Type': 'application/json'
      },
      body: JSON.stringify({
@@ -98,11 +108,10 @@ const eliminarPaciente=async()=>{
      })
    });
    const json=await response.json();
- console.log(json)
    if(json.msg=='ok'){
      Alert.alert('','Paciente eliminado.!')
      vaciarCajas();
-     obtenerPacientes()
+     listadoPaciente(buscador)
    }
    if(json.msg=='no'){
      Alert.alert('','Paciente no eliminado, ya que contiene información.!')
@@ -128,7 +137,7 @@ Alert.alert(
 );
 
  useEffect(() => {
-  obtenerPacientes();
+  listadoPaciente(buscador);
 }, []);
 
   return (
@@ -168,13 +177,13 @@ Alert.alert(
         />
         :<></>
       }
-<Text></Text>
+
       <SearchBar
         placeholder="Buscar por cédula..."
         onChangeText={buscarPersonaXcedula}
         value={buscador}
       />
-        {
+        {data.length>0?
         data.map((l, i) => (
           <ListItem key={i} bottomDivider onPress={()=>selecionarPacienete(l)}>
             <ListItem.Content>
@@ -183,6 +192,7 @@ Alert.alert(
             </ListItem.Content>
           </ListItem>
         ))
+        :<></>
       }
       </View>
       </ScrollView>

@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{useState,useEffect} from 'react';
-import { Platform, StyleSheet,View } from 'react-native';
+import { Platform, StyleSheet,View,ScrollView } from 'react-native';
 import { ListItem, Avatar,BottomSheet,Button,Icon,SearchBar,Text } from 'react-native-elements'
 import UrlBase from '../middleware/UrlBase';
 export default function ModalScreen() {
@@ -19,7 +19,12 @@ export default function ModalScreen() {
 
   async function listadoPaciente(x){
     try {
-      const response= await fetch(UrlBase+"/pacientes?cedula="+x);
+      const response= await fetch(UrlBase+"api/pacientes?cedula="+x,{
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
       const json=await response.json();
       setData(json);
     } catch (error) {
@@ -44,7 +49,12 @@ async function selecionarPacienete(params:Object) {
 
 async function listadoHistorial(x){
   try {
-    const response= await fetch(UrlBase+"/listado-historials?paciente="+x);
+    const response= await fetch(UrlBase+"api/listado-historials?paciente="+x,{
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
     const json=await response.json();
     setlistado(json);
     
@@ -58,7 +68,12 @@ async function listadoHistorial(x){
 
 async function listadoPaciente(x){
   try {
-    const response= await fetch(UrlBase+"/pacientes?cedula="+x);
+    const response= await fetch(UrlBase+"api/pacientes?cedula="+x,{
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
     const json=await response.json();
     setData(json);
   } catch (error) {
@@ -75,6 +90,7 @@ useEffect(() => {
   }, []);
 
   return (
+    <ScrollView>
     <View>
       <BottomSheet
         isVisible={isVisible}
@@ -102,6 +118,7 @@ useEffect(() => {
             </ListItem.Content>
           </ListItem>
       </BottomSheet>
+
       <Button
         icon={<Icon name='person-search' color='#ffffff' />}
         buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
@@ -113,9 +130,12 @@ useEffect(() => {
           listado.length>0?
         listado.map((l, i) => (
           <ListItem key={i} bottomDivider>
+
             <ListItem.Content>
               <ListItem.Title>Pulso: {l.pulso_cardiaco}</ListItem.Title>
+              <ListItem.Subtitle>Estado: {l.estado}</ListItem.Subtitle>
               <ListItem.Subtitle>Fecha: {l.created_at}</ListItem.Subtitle>
+              
             </ListItem.Content>
           </ListItem>
         )):
@@ -123,6 +143,7 @@ useEffect(() => {
       }
 
     </View>
+    </ScrollView>
   );
 }
 

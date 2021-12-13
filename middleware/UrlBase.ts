@@ -1,2 +1,2 @@
-const UrlBase='http://192.168.1.18:8000/api';
+const UrlBase='http://192.168.2.102/';
 export default UrlBase;

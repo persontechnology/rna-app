@@ -38,7 +38,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: true,title:'RnaApp' }} />
+      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false,title:'RnaApp' }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" options={{ title:'Historial' }} component={ModalScreen} />

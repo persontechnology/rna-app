@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{useState,useEffect} from 'react';
-import { Platform, StyleSheet,View,ScrollView } from 'react-native';
+import { Platform, StyleSheet,View,ScrollView,Alert } from 'react-native';
 import { ListItem, Avatar,BottomSheet,Button,Icon,SearchBar,Text } from 'react-native-elements'
 import UrlBase from '../middleware/UrlBase';
 export default function ModalScreen() {
@@ -65,6 +65,39 @@ async function listadoHistorial(x){
   }
 }
 
+const confirmarEliminarHistorial = () =>
+{
+  Alert.alert('Confirmación', 'Está seguro de vaciar el historial de: '+paciente, [
+    {
+      text: 'Cancelar',
+      onPress: () => console.log('Cancel Pressed'),
+      style: 'cancel',
+    },
+    { text: 'Vaciar', onPress: () => eliminarok() },
+  ]);
+}
+
+  const eliminarok=async()=>{
+    try {
+      const response= await fetch(UrlBase+"api/vaciar-historial", {
+       method: 'POST',
+       headers: {
+         'Accept': 'application/json',
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify({
+         id
+       })
+     });
+     const json=await response.json();
+     listadoHistorial(id)
+     console.log(json)
+    } catch (error) {
+      console.log(error)
+    }finally{
+   
+    }
+  }
 
 async function listadoPaciente(x){
   try {
@@ -128,7 +161,19 @@ useEffect(() => {
         
         {
           listado.length>0?
-        listado.map((l, i) => (
+          <>
+          <ListItem key="00" bottomDivider>
+
+            <ListItem.Content>
+            <Button
+              buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0,backgroundColor:'red'}}
+              title='Vaciar historial'
+              onPress={()=>confirmarEliminarHistorial()}
+              />
+            </ListItem.Content>
+          </ListItem>
+
+        {listado.map((l, i) => (
           <ListItem key={i} bottomDivider>
 
             <ListItem.Content>
@@ -138,7 +183,9 @@ useEffect(() => {
               
             </ListItem.Content>
           </ListItem>
-        )):
+        ))}
+        </>
+        :
         <Text>No existe historial</Text>
       }
 

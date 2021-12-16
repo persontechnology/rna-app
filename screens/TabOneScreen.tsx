@@ -65,7 +65,7 @@ async function obtenerPulsos() {
    });
    const json = await response.json();
 
-   console.log(json)
+   
    setpulso(Number.parseFloat(json.valor).toFixed(2))
    switch (json.estado) {
     case '0':

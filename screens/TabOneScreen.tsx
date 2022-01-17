@@ -26,6 +26,7 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<'TabOne'
 
   const [cedula, setcedula] = useState('')
   const [id, setid] = useState('')
+  const [edad, setedad] = useState('')
   const [paciente, setpaciente] = useState('')
   const [pulso, setpulso] = useState('')
   const [buscador, setbuscador] = useState('')
@@ -98,6 +99,7 @@ async function selecionarPacienete(params:Object) {
   setid(params.id)
   setcedula(params.cedula)
   setpaciente(params.apellidos+' '+params.nombres)
+  setedad(params.edad)
   setIsVisible(false)
 }
 
@@ -105,6 +107,7 @@ async function quitarPacienete() {
   setid('')
   setcedula('')
   setpaciente('')
+  setedad('')
 }
 const guardarHistorial=async()=>{
   try {
@@ -158,7 +161,9 @@ const guardarHistorial=async()=>{
         <Text style={{marginBottom: 5,alignItems:'center', justifyContent:'center'}}>
           Cédula: {cedula}
         </Text>
-        
+        <Text style={{marginBottom: 5,alignItems:'center', justifyContent:'center'}}>
+          Edad: {edad}
+        </Text>
         <Button
           icon={<Icon name='person-search' color='#ffffff' />}
           buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}

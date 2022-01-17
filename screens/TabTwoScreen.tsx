@@ -12,6 +12,7 @@ export default function TabTwoScreen() {
   const [apellidos, setapellidos] = useState('');
   const [nombres, setnombres] = useState('')
   const [cedula, setcedula] = useState('')
+  const [edad, setedad] = useState('')
   const [buscador, setbuscador] = useState('')
  
   
@@ -52,7 +53,8 @@ export default function TabTwoScreen() {
         id,
         apellidos,
         nombres,
-        cedula
+        cedula,
+        edad
       })
     });
     const json=await response.json();
@@ -163,6 +165,13 @@ Alert.alert(
           onChangeText={setcedula}
           value={cedula}
           placeholder="Ingrese Cédula"
+          keyboardType="numeric"
+        />
+        <Input
+          label='Edad'
+          onChangeText={setedad}
+          value={edad}
+          placeholder="Ingrese edad"
           keyboardType="numeric"
         />
          <Button
